@@ -1,5 +1,7 @@
 package tr.producttracking;
 
+import com.formdev.flatlaf.FlatDarkLaf;
+
 import javax.swing.*;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
@@ -9,17 +11,7 @@ public class Main {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                try {
-                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                } catch (ClassNotFoundException e) {
-                    throw new RuntimeException(e);
-                } catch (InstantiationException e) {
-                    throw new RuntimeException(e);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                } catch (UnsupportedLookAndFeelException e) {
-                    throw new RuntimeException(e);
-                }
+                FlatDarkLaf.setup();
 
                 JFrame frame = new MainUI();
                 frame.setVisible(true);
