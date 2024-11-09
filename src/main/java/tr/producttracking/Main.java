@@ -1,6 +1,7 @@
 package tr.producttracking;
 
 import com.formdev.flatlaf.FlatDarkLaf;
+import tr.producttracking.utils.Status;
 
 import javax.swing.*;
 
@@ -15,6 +16,8 @@ public class Main {
 
                 JFrame frame = new MainUI();
                 frame.setVisible(true);
+
+                Status.createFile();
             }
         });
     }
