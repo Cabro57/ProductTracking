@@ -14,23 +14,6 @@ public class Status {
 
     }
 
-    public static void createFile(String file_name) {
-        File file = new File(file_path + file_name);
-
-        // Dosya mevcut değilse oluştur
-        if (!file.exists()) {
-            try {
-                file.getParentFile().mkdirs();
-                file.createNewFile();
-                //System.out.println("Dosya oluşturuldu!!!");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-    }
-
-
     public static void createFile() {
         File file = new File(file_path);
 
@@ -38,7 +21,6 @@ public class Status {
             try {
                 file.getParentFile().mkdirs();
                 file.createNewFile();
-                //System.out.println("Dosya oluşturuldu!!!");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -47,8 +29,10 @@ public class Status {
     }
 
     public void addStatus(String status) {
-
-        statuses.add(status);
+        createFile();
+        if (!Status.load().contains(status)) {
+            statuses.add(status);
+        }
     }
 
 
@@ -66,6 +50,7 @@ public class Status {
     }
 
     public static ArrayList<String> load() {
+        createFile();
         statuses = new ArrayList<>();
         try {
             BufferedReader reader = new BufferedReader(new FileReader(file_path));

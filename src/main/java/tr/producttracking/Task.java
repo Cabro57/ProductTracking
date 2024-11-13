@@ -1,6 +1,7 @@
 package tr.producttracking;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class Task {
     private int ID;
@@ -48,8 +49,18 @@ public class Task {
         return payment_date;
     }
 
+    public String getPayment_datetoString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return payment_date.format(formatter);
+    }
+
     public void setPayment_date(LocalDate payment_date) {
         this.payment_date = payment_date;
+    }
+
+    public void setPayment_date(String payment_date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        this.payment_date = LocalDate.parse(payment_date, formatter);
     }
 
     public String getProduct_status() {
@@ -66,5 +77,14 @@ public class Task {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public String toCSV() {
+        return ID + "," + full_name + "," + phone_no + "," + email + "," + getPayment_datetoString() + "," + product_status + "," + comment;
+    }
+
+    @Override
+    public String toString() {
+        return full_name;
     }
 }

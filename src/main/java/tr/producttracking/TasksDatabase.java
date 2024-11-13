@@ -1,23 +1,23 @@
 package tr.producttracking;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 
-public class TasksDatabase {
-    private ArrayList<Task> tasks;
+public class TasksDatabase extends ArrayList<Task> {
     private String file_path;
 
+    private int ID;
+
     public TasksDatabase(String file_name) {
-        this.tasks = new ArrayList<>();
+        this.ID = 0;
         createFile(file_name);
-        load(); // Varolan veriyi yüklemek için
+        load();
     }
 
+    // Dosya oluşturma işlemi
     public void createFile(String file_name) {
-        this.file_path = System.getProperty("user.home") + "\\AppData\\Roaming\\.countdown\\" + file_name;
+        this.file_path = System.getProperty("user.home") + "\\AppData\\Roaming\\.product_tracking\\" + file_name;
         File file = new File(file_path);
 
         if (!file.exists()) {
@@ -31,51 +31,72 @@ public class TasksDatabase {
         }
     }
 
-    public String add(Task task) {
-        tasks.add(task);
-        save();
-        return "Görev eklendi: " + task;
+    public int getSafeID() {
+        while (this.stream().anyMatch(c -> c.getID() == ID)) {
+            ID++;
+        }
+        return ID;
     }
 
-    public void remove(int id) {
-        tasks.removeIf(task -> task.getID() == id);
-        save();
-    }
+    public void update(Task newTask) {
+        for (Task task : this) {
+            if (task.getID() == newTask.getID()) {
 
-    public void update(int id, boolean isCompleted) {
-        for (Task task : tasks) {
-            if (task.getID() == id) {
-                //task.setCompleted(isCompleted);
+                task.setFull_name(newTask.getFull_name());
+                task.setPhone_no(newTask.getPhone_no());
+                task.setEmail(newTask.getEmail());
+                task.setPayment_date(newTask.getPayment_date());
+                task.setProduct_status(newTask.getProduct_status());
+                task.setComment(newTask.getComment());
+
                 save();
                 break;
             }
         }
     }
 
-    public ArrayList<Task> load() {
-        try (Reader reader = new FileReader(file_path)) {
-            Gson gson = new Gson();
-            tasks = gson.fromJson(reader, new TypeToken<ArrayList<Task>>(){}.getType());
-            if (tasks == null) {
-                tasks = new ArrayList<>();
+    public void load() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file_path))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+                if (data.length == 7) {
+                    Task task = new Task(Integer.parseInt(data[0]), data[1]);
+                    task.setPhone_no(data[2]);
+                    task.setEmail(data[3]);
+                    task.setPayment_date(data[4]);
+                    task.setProduct_status(data[5]);
+                    task.setComment(data[6]);
+                    add(task);
+                }
             }
         } catch (IOException e) {
-            e.printStackTrace();
-            tasks = new ArrayList<>();
+            throw new RuntimeException(e);
         }
-        return tasks;
     }
 
     public void save() {
-        try (Writer writer = new FileWriter(file_path)) {
-            Gson gson = new Gson();
-            gson.toJson(tasks, writer);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file_path))) {
+            for (Task task : this) {
+                writer.write(task.toCSV());
+                writer.newLine(); // Satır sonu ekliyoruz
+            }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
-    public ArrayList<Task> getTasks() {
-        return tasks;
+    // ID'ye göre görev alma
+    public Task getTask(int id) {
+        for (Task task : this) {
+            if (task.getID() == id) {
+                return task;
+            }
+        }
+        return null;
+    }
+
+    public List<Task> getTasks() {
+        return TasksDatabase.this;
     }
 }
